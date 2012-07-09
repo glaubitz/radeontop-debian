@@ -1,0 +1,5 @@
+radeontop (0.5.4.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #680892)
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Tue, 10 Jul 2012 01:28:50 +0200

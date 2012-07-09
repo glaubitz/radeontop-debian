@@ -1,0 +1,2 @@
+version=3
+https://github.com/clbr/radeontop/tags .*/tarball/v(\d[\d\.]+)

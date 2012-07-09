@@ -1,0 +1,24 @@
+Source: radeontop
+Section: utils
+Priority: extra
+Maintainer: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Build-Depends: debhelper (>= 9.0.0), libpciaccess-dev, pkg-config, libncurses5-dev
+Standards-Version: 3.9.3
+Homepage: https://github.com/clbr/radeontop
+Vcs-Git: git://github.com/glaubitz/radeontop-debian.git
+Vcs-Browser: https://github.com/glaubitz/radeontop-debian
+
+Package: radeontop
+Architecture: any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Utility to show Radeon GPU utilization
+ radeontop is a small utility which allows one to monitor the utilization of
+ Radeon GPUs starting from the R600 series and newer using undocumented
+ performance counters in the hardware. The utility works with the free
+ drivers.
+ .
+ It displays the utilization of the graphics pipe, event engine, vertex cache,
+ vertex group and tesselator, texture addresser and cache, the shader units
+ and more, both with a relative percent value as well as a colorful bar diagram.
+ .

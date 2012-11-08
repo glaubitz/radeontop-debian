@@ -27,12 +27,16 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
-#define GRBM_STATUS 0x8010
-#define MMAP_SIZE 0x14
+enum {
+	GRBM_STATUS = 0x8010,
+	MMAP_SIZE = 0x14
+};
 
 // radeontop.c
 void die(const char *why);
@@ -52,6 +56,9 @@ extern struct bits_t *results;
 
 // ui.c
 void present(const unsigned int ticks, const char card[], const unsigned int color);
+
+// dump.c
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit);
 
 // chips
 enum radeon_family {

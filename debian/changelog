@@ -1,3 +1,9 @@
+radeontop (0.6-1) unstable; urgency=low
+
+  * Update to latest upstream release.
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Thu, 08 Nov 2012 15:10:56 +0100
+
 radeontop (0.5.4.1-1) unstable; urgency=low
 
   * Initial release (Closes: #680892)

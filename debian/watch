@@ -1,2 +1,3 @@
 version=3
-https://github.com/clbr/radeontop/tags .*/tarball/v(\d[\d\.]+)
+https://github.com/clbr/radeontop/tags .*/v?(\d.*)\.(?:tgz|tbz2|tar\.(?:gz|bz2|xz))
+# Bart Martens <bartm@debian.org>  Fri, 23 Nov 2012 19:47:38 +0000

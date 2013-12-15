@@ -1,35 +1,52 @@
 # The make-provided flags like MAKE and CC aren't set, on purpose.
 # This is Linux-specific software, so we can depend on GNU make.
 
+# Options:
+#	nls	enable translations, default on
+#	debug	enable debug symbols, default off
+#	plain	apply neither -g nor -s.
+
 PREFIX ?= /usr
 INSTALL ?= install
+
+nls ?= 1
 
 bin = radeontop
 src = $(wildcard *.c)
 obj = $(src:.c=.o)
 verh = include/version.h
 
+CFLAGS_SECTIONED = -ffunction-sections -fdata-sections
+LDFLAGS_SECTIONED = -Wl,-gc-sections
+
 CFLAGS ?= -Os
 CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -Iinclude
-CFLAGS += -ffunction-sections -fdata-sections
+CFLAGS += $(CFLAGS_SECTIONED)
 CFLAGS += $(shell pkg-config --cflags pciaccess)
 CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
 
 # Comment this if you don't want translations
-CFLAGS += -DENABLE_NLS=1
+ifeq ($(nls), 1)
+	CFLAGS += -DENABLE_NLS=1
+endif
 
 ifdef debug
 	CFLAGS += -g
+else ifdef plain
+#
 else
 	CFLAGS += -s
 endif
 
-LDFLAGS += -Wl,-O1 -Wl,-gc-sections
+LDFLAGS ?= -Wl,-O1
+LDFLAGS += $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
 
 # On some distros, you might have to change this to ncursesw
-LIBS += $(shell pkg-config --libs ncurses 2>/dev/null || echo "-lncurses")
+LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || \
+		shell pkg-config --libs ncurses 2>/dev/null || \
+		echo "-lncurses")
 
 .PHONY: all clean install man dist
 
@@ -46,6 +63,7 @@ clean:
 .git:
 
 $(verh): .git
+	./getver.sh
 
 trans:
 	xgettext -o translations/radeontop.pot -k_ *.c \
@@ -54,7 +72,9 @@ trans:
 install: all
 	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
 	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
+ifeq ($(nls), 1)
 	$(MAKE) -C translations install PREFIX=$(PREFIX)
+endif
 
 man:
 	a2x -f manpage radeontop.asc

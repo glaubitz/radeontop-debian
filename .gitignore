@@ -1,0 +1,4 @@
+*.o
+radeontop
+version.h
+*.mo

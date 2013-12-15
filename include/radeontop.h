@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <locale.h>
 
 enum {
 	GRBM_STATUS = 0x8010,
@@ -91,6 +92,11 @@ enum radeon_family {
 	TAHITI,
 	PITCAIRN,
 	VERDE,
+	OLAND,
+	HAINAN,
+	BONAIRE,
+	KABINI,
+	KAVERI,
 };
 
 extern const char * const family_str[];

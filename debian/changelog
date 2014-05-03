@@ -1,3 +1,18 @@
+radeontop (0.8-1) unstable; urgency=low
+
+  * New upstream release.
+    - update PCI IDs to support Hawaii GPUs and fix the
+      mislabeled Sumo 2 GPUs
+    - improve Makefile to have better control over -g and -s options
+    - build with libdrm support
+    - add VRAM reporting support
+    - refresh translation template
+  * Clean up debian/changelog.
+  * Update Debian standards version to 3.9.5, no changes required.
+  * Add build dependency to libdrm-dev in debian/control.
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Sat, 03 May 2014 10:31:35 +0200
+
 radeontop (0.7-1) unstable; urgency=low
 
   * New upstream release.
@@ -18,12 +33,12 @@ radeontop (0.6-2) unstable; urgency=low
 
 radeontop (0.6-1) unstable; urgency=low
 
-  * Update to latest upstream release.
+  * New upstream release.
 
  -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Thu, 08 Nov 2012 15:10:56 +0100
 
 radeontop (0.5.4.1-1) unstable; urgency=low
 
-  * Initial release (Closes: #680892)
+  * Initial release. (Closes: #680892)
 
  -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Tue, 10 Jul 2012 01:28:50 +0200

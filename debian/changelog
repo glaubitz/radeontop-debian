@@ -1,3 +1,18 @@
+radeontop (0.9-1) unstable; urgency=medium
+
+  * New upstream release.
+    - add support for Topaz, Tonga and Carrizo
+    - refresh PCI IDs of various cards
+    - add support to allow toggling colors while running
+    - make radeontop work even when CONFIG_DEVMEM is disabled
+      in the configuration of the running kernel
+    - add VRAM reporting support
+    - add support for fglrx
+    - various bug fixes and improvements
+  * Update Debian standards version to 3.9.5, no changes required.
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Tue, 08 Sep 2015 18:20:12 +0200
+
 radeontop (0.8-1) unstable; urgency=low
 
   * New upstream release.

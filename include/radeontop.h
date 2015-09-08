@@ -44,12 +44,17 @@ enum {
 #ifndef RADEON_INFO_VRAM_USAGE
 #define RADEON_INFO_VRAM_USAGE 0x1e
 #endif
+#ifndef RADEON_INFO_READ_REG
+#define RADEON_INFO_READ_REG 0x24
+#endif
 
 // radeontop.c
 void die(const char *why);
+int get_drm_value(int fd, unsigned request, uint32_t *out);
 unsigned int readgrbm();
 
 extern const void *area;
+extern int use_ioctl;
 
 // detect.c
 unsigned int init_pci(unsigned char bus);
@@ -63,7 +68,7 @@ void collect(unsigned int *ticks);
 extern struct bits_t *results;
 
 // ui.c
-void present(const unsigned int ticks, const char card[], const unsigned int color);
+void present(const unsigned int ticks, const char card[], unsigned int color);
 
 // dump.c
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit);
@@ -103,8 +108,12 @@ enum radeon_family {
 	HAINAN,
 	BONAIRE,
 	KABINI,
+	MULLINS,
 	KAVERI,
 	HAWAII,
+	TOPAZ,
+	TONGA,
+	CARRIZO,
 };
 
 extern const char * const family_str[];

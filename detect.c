@@ -39,6 +39,11 @@ static void finddrm(const unsigned char bus) {
 	const int entries = scandir("/dev/dri", &namelist, drmfilter, alphasort);
 	char tmp[160];
 
+	if (entries < 0) {
+		perror("scandir");
+		return;
+	}
+
 	for (i = 0; i < entries; i++) {
 		snprintf(tmp, 160, "/dev/dri/%s", namelist[i]->d_name);
 
@@ -111,27 +116,42 @@ unsigned int init_pci(unsigned char bus) {
 	if (!dev)
 		die(_("Can't find Radeon cards"));
 
-	if (!dev->regions[2].size) die(_("Can't get the register area size"));
+	int reg = 2;
+	if (getfamily(dev->device_id) >= BONAIRE)
+		reg = 5;
 
-//	printf("Found area %p, size %lu\n", area, dev->regions[2].size);
+	if (!dev->regions[reg].size) die(_("Can't get the register area size"));
 
-	int mem = open("/dev/mem", O_RDONLY);
-	if (mem < 0) die(_("Can't open /dev/mem, are you root?"));
-
-	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
-			dev->regions[2].base_addr + 0x8000);
-	if (area == MAP_FAILED) die(_("mmap failed"));
+//	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
 
 	// DRM support for VRAM
 	if (bus)
 		finddrm(bus);
-	else
+	else if (access("/dev/dri/card0", F_OK) == 0)
 		drm_fd = open("/dev/dri/card0", O_RDWR);
+	else if (access("/dev/ati/card0", F_OK) == 0) // fglrx path
+		drm_fd = open("/dev/ati/card0", O_RDWR);
+
+	use_ioctl = 0;
+	if (drm_fd >= 0) {
+		uint32_t rreg = 0x8010;
+		use_ioctl = get_drm_value(drm_fd, RADEON_INFO_READ_REG, &rreg);
+	}
+
+	if (!use_ioctl) {
+		int mem = open("/dev/mem", O_RDONLY);
+		if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
+
+		area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
+				dev->regions[reg].base_addr + 0x8000);
+		if (area == MAP_FAILED) die(_("mmap failed"));
+	}
 
 	bits.vram = 0;
 	if (drm_fd < 0) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 	} else {
+		drmDropMaster(drm_fd);
 		const drmVersion * const ver = drmGetVersion(drm_fd);
 
 /*		printf("Version %u.%u.%u, name %s\n",
@@ -140,14 +160,14 @@ unsigned int init_pci(unsigned char bus) {
 			ver->version_patchlevel,
 			ver->name);*/
 
-		if (ver->version_major < 2 ||
+		if (ver->version_major != 2 ||
 			ver->version_minor < 36) {
 			printf(_("Kernel too old for VRAM reporting.\n"));
 			goto out;
 		}
 
 		// No version indicator, so we need to test once
-		int ret;
+
 		struct drm_radeon_gem_info gem;
 
 		ret = drmCommandWriteRead(drm_fd, DRM_RADEON_GEM_INFO,
@@ -169,6 +189,9 @@ unsigned int init_pci(unsigned char bus) {
 	}
 
 	out:
+
+	pci_system_cleanup();
+
 	return dev->device_id;
 }
 
@@ -203,24 +226,24 @@ void initbits(int fam) {
 
 	// The majority of these is the same from R600 to Southern Islands.
 
-	bits.ee = (1 << 10);
-	bits.vgt = (1 << 16) | (1 << 17);
-	bits.ta = (1 << 14);
-	bits.tc = (1 << 19);
-	bits.sx = (1 << 20);
-	bits.sh = (1 << 21);
-	bits.spi = (1 << 22);
-	bits.smx = (1 << 23);
-	bits.sc = (1 << 24);
-	bits.pa = (1 << 25);
-	bits.db = (1 << 26);
-	bits.cr = (1 << 27);
-	bits.cb = (1 << 30);
-	bits.gui = (1 << 31);
+	bits.ee = (1U << 10);
+	bits.vgt = (1U << 16) | (1U << 17);
+	bits.ta = (1U << 14);
+	bits.tc = (1U << 19);
+	bits.sx = (1U << 20);
+	bits.sh = (1U << 21);
+	bits.spi = (1U << 22);
+	bits.smx = (1U << 23);
+	bits.sc = (1U << 24);
+	bits.pa = (1U << 25);
+	bits.db = (1U << 26);
+	bits.cr = (1U << 27);
+	bits.cb = (1U << 30);
+	bits.gui = (1U << 31);
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
-		bits.ta = (1 << 18);
+		bits.ta = (1U << 18);
 	} else {
 		bits.tc = 0;
 		bits.cr = 0;

@@ -1,3 +1,13 @@
+radeontop (1.0-1) unstable; urgency=medium
+
+  * New upstream release.
+    - resizable terminal support
+    - new pci ids
+    - support for unprivileged use on some X installations
+    - amdgpu support (Polaris 10, 11)
+
+ -- Vittorio Alfieri <vittorio88@gmail.com>  Sat, 18 Feb 2017 19:29:12 +0200
+
 radeontop (0.9-1) unstable; urgency=medium
 
   * New upstream release.

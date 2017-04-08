@@ -35,6 +35,9 @@
 #include <locale.h>
 #include <xf86drm.h>
 #include <radeon_drm.h>
+#ifdef ENABLE_AMDGPU
+#include <amdgpu_drm.h>
+#endif
 
 enum {
 	GRBM_STATUS = 0x8010,
@@ -48,6 +51,9 @@ enum {
 #define RADEON_INFO_READ_REG 0x24
 #endif
 
+// auth.c
+void authenticate_drm(int fd);
+
 // radeontop.c
 void die(const char *why);
 int get_drm_value(int fd, unsigned request, uint32_t *out);
@@ -57,7 +63,7 @@ extern const void *area;
 extern int use_ioctl;
 
 // detect.c
-unsigned int init_pci(unsigned char bus);
+unsigned int init_pci(unsigned char bus, const unsigned char forcemem);
 int getfamily(unsigned int id);
 void initbits(int fam);
 unsigned long long getvram();
@@ -113,7 +119,11 @@ enum radeon_family {
 	HAWAII,
 	TOPAZ,
 	TONGA,
+	FIJI,
 	CARRIZO,
+	STONEY,
+	POLARIS11,
+	POLARIS10,
 };
 
 extern const char * const family_str[];

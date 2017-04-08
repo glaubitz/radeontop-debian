@@ -3,7 +3,7 @@ Upstream-Name: radeontop
 Source: https://github.com/clbr/radeontop
 
 Files: *
-Copyright: 2012 Lauri Kasanen <curaga@operamail.com>
+Copyright: 2012-2017 Lauri Kasanen <curaga@operamail.com>
 License: GPLv3
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ License: GPLv3
  version 3 can be found in `/usr/share/common-licenses/GPL-3'.
 
 Files: debian/*
-Copyright: 2012 John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Copyright: 2012-2017 John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

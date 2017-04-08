@@ -6,14 +6,21 @@
 #	debug	enable debug symbols, default off
 #	nostrip	disable stripping, default off
 #	plain	apply neither -g nor -s.
+#	xcb	enable libxcb to run unprivileged in Xorg, default on
+#	amdgpu	enable amdgpu VRAM size and usage reporting, default off
+#		because amdgpu requires libdrm >= 2.4.63
 
 PREFIX ?= /usr
 INSTALL ?= install
+LIBDIR ?= lib
 
 nls ?= 1
+xcb ?= 1
+amdgpu ?= 0
 
 bin = radeontop
-src = $(wildcard *.c)
+xcblib = libradeontop_xcb.so
+src = $(filter-out auth_xcb.c,$(wildcard *.c))
 obj = $(src:.c=.o)
 verh = include/version.h
 
@@ -26,11 +33,19 @@ CFLAGS += -Iinclude
 CFLAGS += $(CFLAGS_SECTIONED)
 CFLAGS += $(shell pkg-config --cflags pciaccess)
 CFLAGS += $(shell pkg-config --cflags libdrm)
+ifeq ($(xcb), 1)
+	CFLAGS += $(shell pkg-config --cflags xcb xcb-dri2)
+	CFLAGS += -DENABLE_XCB=1
+endif
 CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
 
 # Comment this if you don't want translations
 ifeq ($(nls), 1)
 	CFLAGS += -DENABLE_NLS=1
+endif
+
+ifeq ($(amdgpu), 1)
+	CFLAGS += -DENABLE_AMDGPU=1
 endif
 
 ifndef plain
@@ -45,6 +60,10 @@ LDFLAGS ?= -Wl,-O1
 LDFLAGS += $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
 LIBS += $(shell pkg-config --libs libdrm)
+ifeq ($(xcb), 1)
+	xcb_LIBS += $(shell pkg-config --libs xcb xcb-dri2)
+	LIBS += -ldl
+endif
 
 # On some distros, you might have to change this to ncursesw
 LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || \
@@ -55,13 +74,20 @@ LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || \
 
 all: $(bin)
 
+ifeq ($(xcb), 1)
+all: $(xcblib)
+
+$(xcblib): auth_xcb.c $(wildcard include/*.h) $(verh)
+	$(CC) -shared -fPIC -o $@ $< $(CFLAGS) $(LDFLAGS) $(xcb_LIBS)
+endif
+
 $(obj): $(wildcard include/*.h) $(verh)
 
 $(bin): $(obj)
 	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS) $(LIBS)
 
 clean:
-	rm -f *.o $(bin)
+	rm -f *.o $(bin) $(xcblib)
 
 .git:
 
@@ -74,6 +100,9 @@ trans:
 
 install: all
 	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
+ifeq ($(xcb), 1)
+	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(xcblib)
+endif
 	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
 ifeq ($(nls), 1)
 	$(MAKE) -C translations install PREFIX=$(PREFIX)

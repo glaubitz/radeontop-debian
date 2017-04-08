@@ -99,20 +99,26 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 
 	const unsigned int bigh = 23;
 
-	unsigned int w, h;
-	getmaxyx(stdscr, h, w);
-
-	const unsigned int hw = w/2;
-
-	attron(A_REVERSE);
-	mvhline(0, 0, ' ', w);
-	printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec"),
-			VERSION, card, 	ticks);
-	attroff(A_REVERSE);
+	// Screen dimensions. (Re)calculated only when resize is non-zero.
+	unsigned int h = 1, w = 1, hw = 1;
+	int resize = 1;
 
 	while(1) {
+		if (resize) {
+			resize = 0;
+			getmaxyx(stdscr, h, w);
+			hw = w/2;
+		}
 
-		move(2, 0);
+		//draw the header
+		move(0,0);
+		attron(A_REVERSE);
+		mvhline(0, 0, ' ', w);
+		printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec"),
+			    VERSION, card, 	ticks);
+		attroff(A_REVERSE);
+
+		move(1,0);
 		clrtobot();
 
 		// Again, no need to protect these. Worst that happens is a slightly
@@ -228,11 +234,15 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 			if (color) attroff(COLOR_PAIR(2));
 		}
 
+		//move the cursor away to fix some resizing artifacts on some terminals
+		move(0,0);
+
 		refresh();
 
 		int c = getch();
 		if (c == 'q' || c == 'Q') break;
 		if (c == 'c' || c == 'C') color = !color;
+		if (c == KEY_RESIZE) resize = 1;
 	}
 
 	endwin();

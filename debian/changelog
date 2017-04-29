@@ -1,6 +1,7 @@
 radeontop (1.0-1) unstable; urgency=medium
 
   * New upstream release.
+<<<<<<< master
     - add support for resizable terminals
     - add support for VRAM size and usage reporting on amdgpu
     - add support for Polaris 10 and Polaris 11
@@ -13,6 +14,7 @@ radeontop (1.0-1) unstable; urgency=medium
   * Update years in debian/copyright.
 
  -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Sat, 08 Apr 2017 19:26:11 +0200
+>>>>>>> master
 
 radeontop (0.9-1) unstable; urgency=medium
 

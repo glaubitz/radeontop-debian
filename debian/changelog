@@ -1,12 +1,20 @@
 radeontop (1.0-1) unstable; urgency=medium
 
   * New upstream release.
-    - resizable terminal support
-    - new pci ids
-    - support for unprivileged use on some X installations
-    - amdgpu support (Polaris 10, 11)
+<<<<<<< master
+    - add support for resizable terminals
+    - add support for VRAM size and usage reporting on amdgpu
+    - add support for Polaris 10 and Polaris 11
+    - add optional unprivileged mode in Xorg
+    - allow unprivileged use of radeontop via console
+    - various bug fixes and improvements
+  * Update standards version to 3.9.8 in debian/control.
+  * Add libxcb1-dev and libxcb-dri2-0-dev to
+    Build-Depends in debian/control.
+  * Update years in debian/copyright.
 
- -- Vittorio Alfieri <vittorio88@gmail.com>  Sat, 18 Feb 2017 19:29:12 +0200
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Sat, 08 Apr 2017 19:26:11 +0200
+>>>>>>> master
 
 radeontop (0.9-1) unstable; urgency=medium
 

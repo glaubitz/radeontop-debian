@@ -67,6 +67,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem);
 int getfamily(unsigned int id);
 void initbits(int fam);
 unsigned long long getvram();
+unsigned long long getgtt();
 
 // ticks.c
 void collect(unsigned int *ticks);
@@ -124,6 +125,9 @@ enum radeon_family {
 	STONEY,
 	POLARIS11,
 	POLARIS10,
+	POLARIS12,
+	VEGA10,
+	RAVEN,
 };
 
 extern const char * const family_str[];
@@ -145,10 +149,12 @@ struct bits_t {
 	unsigned int cb;
 	unsigned int cr;
 	unsigned long long vram;
+	unsigned long long gtt;
 };
 
 extern struct bits_t bits;
 extern unsigned long long vramsize;
+extern unsigned long long gttsize;
 extern int drm_fd;
 
 #endif

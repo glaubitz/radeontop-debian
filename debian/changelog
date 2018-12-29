@@ -1,3 +1,18 @@
+radeontop (1.1-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #894054)
+    - update PCI IDs for one polaris12 and one raven card
+    - drop privileges for setuid installations
+    - add appstream info file
+    - add support for GTT memory status
+    - update amdgpu PCI IDs; two new ones for old
+      families, polaris 12 and vega 10 cards
+    - various bug fixes and improvements
+  * Bump debhelper version to 12.
+  * Update standards version to 4.2.1, no changes required.
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Sun, 30 Dec 2018 00:32:12 +0100
+
 radeontop (1.0-1) unstable; urgency=medium
 
   * New upstream release.

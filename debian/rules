@@ -5,6 +5,8 @@
 #export DH_VERBOSE=1
 export debug=1
 
+export DEB_CFLAGS_MAINT_APPEND += -DENABLE_AMDGPU=1
+
 override_dh_auto_build:
 	:
 

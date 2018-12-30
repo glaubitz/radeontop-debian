@@ -5,5 +5,8 @@
 #export DH_VERBOSE=1
 export debug=1
 
+override_dh_auto_build:
+	:
+
 %:
 	dh $@ 

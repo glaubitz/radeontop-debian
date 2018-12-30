@@ -1,3 +1,13 @@
+radeontop (1.1-2) unstable; urgency=medium
+
+  * Override dh_auto_build with empty target in debian/rules
+    to avoid radeontop being built twice.
+  * Remove trailing space from dh command line in debian/rules.
+  * Add -DENABLE_AMDGPU=1 to DEB_CFLAGS_MAINT_APPEND to
+    enable amdgpu support. (Closes: #870135)
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Sun, 30 Dec 2018 13:16:25 +0100
+
 radeontop (1.1-1) unstable; urgency=medium
 
   * New upstream release. (Closes: #894054)

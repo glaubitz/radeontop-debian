@@ -76,7 +76,8 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 	attroff(A_REVERSE);
 }
 
-void present(const unsigned int ticks, const char card[], unsigned int color) {
+void present(const unsigned int ticks, const char card[], unsigned int color,
+		const unsigned char bus, const unsigned int dumpinterval) {
 
 	printf(_("Collecting data, please wait....\n"));
 
@@ -114,8 +115,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 		move(0,0);
 		attron(A_REVERSE);
 		mvhline(0, 0, ' ', w);
-		printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec"),
-			    VERSION, card, 	ticks);
+		printcenter(0, w, _("radeontop %s, running on %s bus %02x, %u samples/sec"),
+			    VERSION, card, bus, ticks);
 		attroff(A_REVERSE);
 
 		move(1,0);
@@ -123,26 +124,31 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
-		float ee = 100.0 * (float) results->ee / ticks;
-		float vgt = 100.0 * (float) results->vgt / ticks;
-		float gui = 100.0 * (float) results->gui / ticks;
-		float ta = 100.0 * (float) results->ta / ticks;
-		float tc = 100.0 * (float) results->tc / ticks;
-		float sx = 100.0 * (float) results->sx / ticks;
-		float sh = 100.0 * (float) results->sh / ticks;
-		float spi = 100.0 * (float) results->spi / ticks;
-		float smx = 100.0 * (float) results->smx / ticks;
-		float sc = 100.0 * (float) results->sc / ticks;
-		float pa = 100.0 * (float) results->pa / ticks;
-		float db = 100.0 * (float) results->db / ticks;
-		float cr = 100.0 * (float) results->cr / ticks;
-		float cb = 100.0 * (float) results->cb / ticks;
-		float vram = 100.0 * (float) results->vram / vramsize;
+		float k = 1.0f / ticks / dumpinterval;
+		float ee = 100 * results->ee * k;
+		float vgt = 100 * results->vgt * k;
+		float gui = 100 * results->gui * k;
+		float ta = 100 * results->ta * k;
+		float tc = 100 * results->tc * k;
+		float sx = 100 * results->sx * k;
+		float sh = 100 * results->sh * k;
+		float spi = 100 * results->spi * k;
+		float smx = 100 * results->smx * k;
+		float sc = 100 * results->sc * k;
+		float pa = 100 * results->pa * k;
+		float db = 100 * results->db * k;
+		float cr = 100 * results->cr * k;
+		float cb = 100 * results->cb * k;
+		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
-		float gtt = 100.0 * (float) results->gtt / gttsize;
+		float gtt = 100.0f * results->gtt / gttsize;
 		float gttmb = results->gtt / 1024.0f / 1024.0f;
 		float gttsizemb = gttsize / 1024.0f / 1024.0f;
+		float mclk = 100.0f * (results->mclk * k) / (mclk_max / 1e3f);
+		float sclk = 100.0f * (results->sclk * k) / (sclk_max / 1e3f);
+		float mclk_ghz = results->mclk * k / 1000.0f;
+		float sclk_ghz = results->sclk * k / 1000.0f;
 
 		mvhline(3, 0, ACS_HLINE, w);
 		mvvline(1, (w/2) + 1, ACS_VLINE, h);
@@ -226,23 +232,36 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 		}
 		if (color) attroff(COLOR_PAIR(5));
 
-		// Enough height?
-		if (h > bigh) start++;
+		if (bits.vram || bits.gtt) {
+			// Enough height?
+			if (h > bigh) start++;
 
-		if (bits.vram) {
-			if (color) attron(COLOR_PAIR(2));
-			percentage(start, w, vram);
-			printright(start++, hw, _("%.0fM / %.0fM VRAM %6.2f%%"),
-					vrammb, vramsizemb, vram);
-			if (color) attroff(COLOR_PAIR(2));
+			if (bits.vram) {
+				if (color) attron(COLOR_PAIR(2));
+				percentage(start, w, vram);
+				printright(start++, hw, _("%.0fM / %.0fM VRAM %6.2f%%"),
+						vrammb, vramsizemb, vram);
+				if (color) attroff(COLOR_PAIR(2));
+			}
+
+			if (bits.gtt) {
+				if (color) attron(COLOR_PAIR(2));
+				percentage(start, w, gtt);
+				printright(start++, hw, _("%.0fM / %.0fM GTT %6.2f%%"),
+						gttmb, gttsizemb, gtt);
+				if (color) attroff(COLOR_PAIR(2));
+			}
 		}
 
-		if (bits.gtt) {
-			if (color) attron(COLOR_PAIR(2));
-			percentage(start, w, gtt);
-			printright(start++, hw, _("%.0fM / %.0fM GTT %6.2f%%"),
-					gttmb, gttsizemb, gtt);
-			if (color) attroff(COLOR_PAIR(2));
+		if (mclk_max != 0 && mclk > 0) {
+			if (color) attron(COLOR_PAIR(3));
+			percentage(start, w, mclk);
+			printright(start++, hw, _("%.2fG / %.2fG Memory Clock %6.2f%%"),
+					mclk_ghz, mclk_max * 1e-6f, mclk);
+			percentage(start, w, sclk);
+			printright(start++, hw, _("%.2fG / %.2fG Shader Clock %6.2f%%"),
+					sclk_ghz, sclk_max * 1e-6f, sclk);
+			if (color) attroff(COLOR_PAIR(3));
 		}
 
 		//move the cursor away to fix some resizing artifacts on some terminals

@@ -1,5 +1,6 @@
 /*
 	Copyright (C) 2012 Lauri Kasanen
+	Copyright (C) 2018 Genesis Cloud Ltd.
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -17,7 +18,9 @@
 #ifndef RADEONTOP_H
 #define RADEONTOP_H
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include "version.h"
 #include "gettext.h"
@@ -63,22 +66,24 @@ extern const void *area;
 extern int use_ioctl;
 
 // detect.c
-unsigned int init_pci(unsigned char bus, const unsigned char forcemem);
+void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem);
 int getfamily(unsigned int id);
 void initbits(int fam);
 unsigned long long getvram();
 unsigned long long getgtt();
+unsigned long long getmclk();
+unsigned long long getsclk();
 
 // ticks.c
-void collect(unsigned int *ticks);
+void collect(unsigned int ticks, unsigned int dumpinterval);
 
 extern struct bits_t *results;
 
 // ui.c
-void present(const unsigned int ticks, const char card[], unsigned int color);
+void present(const unsigned int ticks, const char card[], unsigned int color, const unsigned char bus, const unsigned int dumpinterval);
 
 // dump.c
-void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit);
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, const unsigned char bus, const unsigned int dumpinterval);
 
 // chips
 enum radeon_family {
@@ -126,7 +131,10 @@ enum radeon_family {
 	POLARIS11,
 	POLARIS10,
 	POLARIS12,
+	VEGAM,
 	VEGA10,
+	VEGA12,
+	VEGA20,
 	RAVEN,
 };
 
@@ -150,11 +158,15 @@ struct bits_t {
 	unsigned int cr;
 	unsigned long long vram;
 	unsigned long long gtt;
+	unsigned long long mclk;
+	unsigned long long sclk;
 };
 
 extern struct bits_t bits;
 extern unsigned long long vramsize;
 extern unsigned long long gttsize;
+extern unsigned long long mclk_max;
+extern unsigned long long sclk_max;
 extern int drm_fd;
 
 #endif

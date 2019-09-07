@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 Lauri Kasanen
+    Copyright (C) 2018 Genesis Cloud Ltd.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +29,8 @@ static void sighandler(int sig) {
 	}
 }
 
-void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit) {
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit,
+		const unsigned char bus, const unsigned int dumpinterval) {
 
 #ifdef ENABLE_NLS
 	// This is a data format, so disable decimal point localization
@@ -75,26 +77,33 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		fprintf(f, "%llu.%llu: ", (unsigned long long) t.tv_sec,
 				(unsigned long long) t.tv_usec);
 
+		fprintf(f, "bus %02x, ", bus);
+
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
-		float ee = 100.0 * (float) results->ee / ticks;
-		float vgt = 100.0 * (float) results->vgt / ticks;
-		float gui = 100.0 * (float) results->gui / ticks;
-		float ta = 100.0 * (float) results->ta / ticks;
-		float tc = 100.0 * (float) results->tc / ticks;
-		float sx = 100.0 * (float) results->sx / ticks;
-		float sh = 100.0 * (float) results->sh / ticks;
-		float spi = 100.0 * (float) results->spi / ticks;
-		float smx = 100.0 * (float) results->smx / ticks;
-		float sc = 100.0 * (float) results->sc / ticks;
-		float pa = 100.0 * (float) results->pa / ticks;
-		float db = 100.0 * (float) results->db / ticks;
-		float cr = 100.0 * (float) results->cr / ticks;
-		float cb = 100.0 * (float) results->cb / ticks;
-		float vram = 100.0 * (float) results->vram / vramsize;
+		float k = 1.0f / ticks / dumpinterval;
+		float ee = 100 * results->ee * k;
+		float vgt = 100 * results->vgt * k;
+		float gui = 100 * results->gui * k;
+		float ta = 100 * results->ta * k;
+		float tc = 100 * results->tc * k;
+		float sx = 100 * results->sx * k;
+		float sh = 100 * results->sh * k;
+		float spi = 100 * results->spi * k;
+		float smx = 100 * results->smx * k;
+		float sc = 100 * results->sc * k;
+		float pa = 100 * results->pa * k;
+		float db = 100 * results->db * k;
+		float cr = 100 * results->cr * k;
+		float cb = 100 * results->cb * k;
+		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
-		float gtt = 100.0 * (float) results->gtt / gttsize;
+		float gtt = 100.0f * results->gtt / gttsize;
 		float gttmb = results->gtt / 1024.0f / 1024.0f;
+		float mclk = 100.0f * (results->mclk * k) / (mclk_max / 1e3f);
+		float sclk = 100.0f * (results->sclk * k) / (sclk_max / 1e3f);
+		float mclk_ghz = results->mclk * k / 1000.0f;
+		float sclk_ghz = results->sclk * k / 1000.0f;
 
 		fprintf(f, "gpu %.2f%%, ", gui);
 		fprintf(f, "ee %.2f%%, ", ee);
@@ -120,22 +129,25 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		fprintf(f, "cb %.2f%%", cb);
 
 		if (bits.vram)
-			fprintf(f, ", vram %.2f%% %.2fmb\n", vram, vrammb);
-		else
-			fprintf(f, "\n");
+			fprintf(f, ", vram %.2f%% %.2fmb", vram, vrammb);
 
 		if (bits.gtt)
-			fprintf(f, ", gtt %.2f%% %.2fmb\n", gtt, gttmb);
-		else
-			fprintf(f, "\n");
+			fprintf(f, ", gtt %.2f%% %.2fmb", gtt, gttmb);
 
+		if (mclk_max != 0 && mclk > 0)
+			fprintf(f, ", mclk %.2f%% %.3fghz, sclk %.2f%% %.3fghz",
+					mclk, mclk_ghz, sclk, sclk_ghz);
+
+		fprintf(f, "\n");
 		fflush(f);
 
 		// Did we get a termination signal?
 		if (quit)
 			break;
 
-		sleep(1);
+		// No sleeping on the last line.
+		if (!limit || count > 1)
+			sleep(dumpinterval);
 	}
 
 	fflush(f);

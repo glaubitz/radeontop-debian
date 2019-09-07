@@ -1,3 +1,22 @@
+radeontop (1.2-1) unstable; urgency=medium
+
+  * New upstream release.
+    - update PCI IDs from latest kernel, Navi10 support
+    - update PCI IDs, adding VEGAM, VEGA12 and VEGA20
+    - fix bus being wrong when auto-detecting GPU
+    - add an soname to libradeontop_xcb.so
+    - tune the UI so it fits to normal terminals still
+    - bump the required libdrm version to 2.4.77
+    - add support for memory and shader clock reporting
+    - update man page
+    - add --dump-interval command-line option
+    - fix bus parameter to be hexadecimal
+    - add bus information to dump and UI
+    - don't sleep when dumping the last line
+  * Update standards version to 4.4.0, no changes required.
+
+ -- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>  Sat, 07 Sep 2019 15:21:38 +0200
+
 radeontop (1.1-2) unstable; urgency=medium
 
   * Override dh_auto_build with empty target in debian/rules

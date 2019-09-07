@@ -8,11 +8,12 @@
 #	plain	apply neither -g nor -s.
 #	xcb	enable libxcb to run unprivileged in Xorg, default on
 #	amdgpu	enable amdgpu VRAM size and usage reporting, default off
-#		because amdgpu requires libdrm >= 2.4.63
+#		because amdgpu requires libdrm >= 2.4.77
 
 PREFIX ?= /usr
 INSTALL ?= install
 LIBDIR ?= lib
+MANDIR ?= share/man
 
 nls ?= 1
 xcb ?= 1
@@ -78,7 +79,7 @@ ifeq ($(xcb), 1)
 all: $(xcblib)
 
 $(xcblib): auth_xcb.c $(wildcard include/*.h) $(verh)
-	$(CC) -shared -fPIC -o $@ $< $(CFLAGS) $(LDFLAGS) $(xcb_LIBS)
+	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $< $(CFLAGS) $(LDFLAGS) $(xcb_LIBS)
 endif
 
 $(obj): $(wildcard include/*.h) $(verh)
@@ -103,7 +104,7 @@ install: all
 ifeq ($(xcb), 1)
 	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(xcblib)
 endif
-	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
+	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/radeontop.1
 ifeq ($(nls), 1)
 	$(MAKE) -C translations install PREFIX=$(PREFIX)
 endif

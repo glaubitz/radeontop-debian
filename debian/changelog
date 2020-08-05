@@ -5,6 +5,8 @@ radeontop (1.2-2) UNRELEASED; urgency=medium
   * Change priority extra to priority optional.
   * Use secure URI in Vcs control header Vcs-Git.
   * Update standards version to 4.5.0, no changes needed.
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
 
  -- Debian Janitor <janitor@jelmer.uk>  Mon, 04 May 2020 23:43:56 +0000
 

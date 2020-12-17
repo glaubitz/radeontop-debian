@@ -1,11 +1,11 @@
 Source: radeontop
 Section: utils
-Priority: extra
+Priority: optional
 Maintainer: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Build-Depends: debhelper (>= 12), libpciaccess-dev, pkg-config, libncurses5-dev, libdrm-dev, libxcb1-dev, libxcb-dri2-0-dev
-Standards-Version: 4.4.0
+Build-Depends: debhelper-compat (= 12), libpciaccess-dev, pkg-config, libncurses5-dev, libdrm-dev, libxcb1-dev, libxcb-dri2-0-dev
+Standards-Version: 4.5.0
 Homepage: https://github.com/clbr/radeontop
-Vcs-Git: git://github.com/glaubitz/radeontop-debian.git
+Vcs-Git: https://github.com/glaubitz/radeontop-debian.git
 Vcs-Browser: https://github.com/glaubitz/radeontop-debian
 
 Package: radeontop
